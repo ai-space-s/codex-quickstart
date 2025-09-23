@@ -59,4 +59,38 @@ describe('App task flow', () => {
 
     expect(screen.getByText('Stored Task')).toBeInTheDocument();
   });
+
+  it('displays the entered due date for plain date inputs in a negative offset timezone', async () => {
+    const originalTZ = process.env.TZ;
+
+    try {
+      process.env.TZ = 'America/Los_Angeles';
+
+      await renderApp();
+
+      const input = screen.getByLabelText(/What needs to be done/i);
+      fireEvent.change(input, { target: { value: 'Task with due date' } });
+
+      const dueDateInput = screen.getByLabelText(/Due date/i);
+      fireEvent.change(dueDateInput, { target: { value: '2024-04-10' } });
+
+      const addButton = screen.getByRole('button', { name: /Add task/i });
+      fireEvent.click(addButton);
+
+      const expectedDueDate = new Intl.DateTimeFormat(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }).format(new Date(2024, 3, 10));
+
+      expect(screen.getByText('Task with due date')).toBeInTheDocument();
+      expect(screen.getByText(expectedDueDate)).toBeInTheDocument();
+    } finally {
+      if (originalTZ === undefined) {
+        delete process.env.TZ;
+      } else {
+        process.env.TZ = originalTZ;
+      }
+    }
+  });
 });

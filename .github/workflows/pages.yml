@@ -20,31 +20,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1) Node 먼저 + pnpm 캐시를 lockfile 기준으로 사용
+      # Node 설치 + pnpm 캐시 (락파일 경로 지정)
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
 
-      # 2) pnpm 을 PATH에 설치/활성화 (이 스텝이 없으면 지금 같은 에러가 납니다)
+      # pnpm 설치/활성화 (이 스텝이 있어야 pnpm 명령이 동작)
       - uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
 
-      # 3) 락파일 존재 가드(명확한 실패 메시지)
+      # sanity check: pnpm PATH 확인
+      - run: pnpm --version
+
+      # 락파일 존재 가드 (원인 명확화)
       - name: Ensure pnpm lockfile is present
         run: test -f pnpm-lock.yaml
 
-      # 4) 의존성 설치/빌드
+      # 설치/빌드
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
-      # 5) SPA 새로고침 404 방지(선택 권장)
+      # SPA 새로고침 404 방지(선택 권장)
       - run: cp dist/index.html dist/404.html
 
-      # 6) Pages artifact 업로드
+      # Pages artifact 업로드
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist

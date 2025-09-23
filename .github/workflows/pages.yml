@@ -19,15 +19,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Node 먼저 설치 + pnpm 캐시: lockfile 경로를 명시 (필수)
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      # pnpm 설정 (설치 실행은 아래에서 수동으로)
       - uses: pnpm/action-setup@v4
         with:
           version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-      - run: pnpm install
+          run_install: false
+
+      # lockfile을 신뢰해서 설치
+      - run: pnpm install --frozen-lockfile
+
       - run: pnpm build
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist

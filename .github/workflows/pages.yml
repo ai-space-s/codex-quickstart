@@ -23,7 +23,7 @@ jobs:
       # 1) pnpm을 먼저 설치/활성화 (PATH에 pnpm 추가)
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 10.17.1
           run_install: false
 
       # 2) Node 설치 + pnpm 캐시 (이 시점에 pnpm이 존재해야 함)

@@ -10,7 +10,16 @@ type TaskItemProps = {
 
 const formatDate = (value?: string | null) => {
   if (!value) return null;
-  const date = new Date(value);
+
+  const plainDateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const date = plainDateMatch
+    ? new Date(
+        Number(plainDateMatch[1]),
+        Number(plainDateMatch[2]) - 1,
+        Number(plainDateMatch[3])
+      )
+    : new Date(value);
+
   if (Number.isNaN(date.getTime())) return null;
   return new Intl.DateTimeFormat(undefined, {
     month: 'short',

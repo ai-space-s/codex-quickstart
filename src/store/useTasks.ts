@@ -38,12 +38,15 @@ export const useTasks = create<TaskState>((set) => ({
       return;
     }
 
+    const normalizedDueDate =
+      typeof dueDate === 'string' && dueDate.trim() !== '' ? dueDate : null;
+
     const newTask: Task = {
       id: nanoid(),
       title: trimmed,
       completed: false,
       createdAt: new Date().toISOString(),
-      dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+      dueDate: normalizedDueDate,
     };
 
     set((state) => ({ tasks: [newTask, ...state.tasks] }));
